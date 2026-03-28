@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Postagem do Administrador | Elo Saúde</title>
+  <link rel="stylesheet" href="../css/postagem.css">
+</head>
+<body>
+
+  <main class="post-page">
+    <section class="post-box">
+      <div class="login-topo">
+        <h1>Nova postagem</h1>
+        <p>Monte a postagem com texto, imagem e vídeo na ordem que quiser.</p>
+      </div>
+
+      <form id="formPostagem" class="login-form" novalidate>
+        <div class="campo">
+          <label for="titulo">Título da postagem</label>
+          <input
+            type="text"
+            id="titulo"
+            name="titulo"
+            placeholder="Digite o título da postagem"
+            required
+          >
+          <small class="erro" id="erroTitulo"></small>
+        </div>
+
+        <div class="botoes-bloco">
+          <button type="button" class="btn-bloco" id="btnAddTexto">+ Texto</button>
+          <button type="button" class="btn-bloco" id="btnAddImagem">+ Imagem</button>
+          <button type="button" class="btn-bloco" id="btnAddVideo">+ Vídeo</button>
+        </div>
+
+        <div id="editor" class="editor-blocos"></div>
+
+        <div id="mensagemPostagem" class="mensagem"></div>
+
+        <button type="submit" class="btn-login">Salvar postagem</button>
+      </form>
+
+      <div class="painel-postagens">
+        <h2>Postagens salvas</h2>
+        <div id="listaPostagensAdmin" class="lista-postagens-admin"></div>
+      </div>
+
+      <div class="area-voltar">
+        <a href="home.html" class="btn-voltar">Voltar para Home</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/postagem.js"></script>
+</body>
+</html>

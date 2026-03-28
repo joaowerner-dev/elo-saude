@@ -6,14 +6,14 @@ const erroSenha = document.getElementById("erroSenha");
 const mensagemLogin = document.getElementById("mensagemLogin");
 const toggleSenha = document.getElementById("toggleSenha");
 
-/* DADOS DE LOGIN */
-const usuarioCorreto = "admin";
-const senhaCorreta = "123456";
+// ==========================
+// MOSTRAR / OCULTAR SENHA
+// ==========================
+if (toggleSenha && senhaInput) {
+  toggleSenha.addEventListener("click", () => {
+    const tipoAtual = senhaInput.type;
 
-/* MOSTRAR / OCULTAR SENHA */
-if (toggleSenha) {
-  toggleSenha.addEventListener("click", function () {
-    if (senhaInput.type === "password") {
+    if (tipoAtual === "password") {
       senhaInput.type = "text";
       toggleSenha.textContent = "Ocultar";
     } else {
@@ -23,80 +23,87 @@ if (toggleSenha) {
   });
 }
 
-/* LIMPAR ERROS */
-function limparErros() {
+// ==========================
+// LIMPAR ERROS AO DIGITAR
+// ==========================
+usuarioInput.addEventListener("input", () => {
   erroUsuario.textContent = "";
+});
+
+senhaInput.addEventListener("input", () => {
   erroSenha.textContent = "";
-  mensagemLogin.textContent = "";
-  mensagemLogin.className = "mensagem";
+});
 
-  usuarioInput.classList.remove("input-invalido");
-  senhaInput.classList.remove("input-invalido");
-}
-
-/* MARCAR ERRO */
-function marcarErro(input, campoErro, mensagem) {
-  campoErro.textContent = mensagem;
-  input.classList.add("input-invalido");
-}
-
-/* VALIDAR CAMPOS */
-function validarCampos(usuario, senha) {
-  let formularioValido = true;
-
-  if (usuario === "") {
-    marcarErro(usuarioInput, erroUsuario, "Digite o nome do administrador.");
-    formularioValido = false;
-  } else if (usuario.length < 3) {
-    marcarErro(usuarioInput, erroUsuario, "O nome deve ter pelo menos 3 caracteres.");
-    formularioValido = false;
-  }
-
-  if (senha === "") {
-    marcarErro(senhaInput, erroSenha, "Digite a senha.");
-    formularioValido = false;
-  } else if (senha.length < 6) {
-    marcarErro(senhaInput, erroSenha, "A senha deve ter pelo menos 6 caracteres.");
-    formularioValido = false;
-  }
-
-  return formularioValido;
-}
-
-/* LOGIN */
+// ==========================
+// LOGIN
+// ==========================
 if (formLogin) {
   formLogin.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    limparErros();
-
     const usuario = usuarioInput.value.trim();
     const senha = senhaInput.value.trim();
 
-    const valido = validarCampos(usuario, senha);
+    erroUsuario.textContent = "";
+    erroSenha.textContent = "";
+    mensagemLogin.textContent = "";
+    mensagemLogin.className = "mensagem";
 
-    if (!valido) {
-      mensagemLogin.textContent = "Preencha os campos corretamente.";
-      mensagemLogin.classList.add("erro-geral");
+    let valido = true;
+
+    // VALIDAÇÃO
+    if (!usuario) {
+      erroUsuario.textContent = "Digite o nome do administrador.";
+      valido = false;
+    }
+
+    if (!senha) {
+      erroSenha.textContent = "Digite a senha.";
+      valido = false;
+    }
+
+    if (!valido) return;
+
+    // ==========================
+    // CONTROLE DE TENTATIVAS
+    // ==========================
+    let tentativas = parseInt(localStorage.getItem("tentativasLogin")) || 0;
+
+    if (tentativas >= 5) {
+      mensagemLogin.textContent = "Muitas tentativas. Tente novamente mais tarde.";
+      mensagemLogin.classList.add("erro");
       return;
     }
 
-    if (usuario === usuarioCorreto && senha === senhaCorreta) {
-      localStorage.setItem("adminLogado", "true");
-      localStorage.setItem("adminNome", usuario);
+    // ==========================
+    // LOGIN CORRETO
+    // ==========================
+    if (usuario === "admin" && senha === "123456") {
 
-      mensagemLogin.textContent = "Login realizado com sucesso. Redirecionando...";
+      localStorage.setItem("adminLogado", "true");
+      localStorage.removeItem("tentativasLogin");
+
+      mensagemLogin.textContent = "Login realizado com sucesso!";
       mensagemLogin.classList.add("sucesso");
 
-      setTimeout(function () {
-        window.location.href = "painel-admin.html";
-      }, 1200);
-    } else {
-      mensagemLogin.textContent = "Nome ou senha inválidos.";
-      mensagemLogin.classList.add("erro-geral");
+      // DESATIVA BOTÃO
+      const botao = formLogin.querySelector("button");
+      botao.disabled = true;
+      botao.textContent = "Entrando...";
 
-      usuarioInput.classList.add("input-invalido");
-      senhaInput.classList.add("input-invalido");
+      setTimeout(() => {
+        window.location.href = "postagem.html";
+      }, 1000);
+
+    } else {
+      tentativas++;
+      localStorage.setItem("tentativasLogin", tentativas);
+
+      mensagemLogin.textContent = `Usuário ou senha inválidos. Tentativa ${tentativas}/5`;
+      mensagemLogin.classList.add("erro");
+
+      senhaInput.value = "";
+      senhaInput.focus();
     }
   });
 }
